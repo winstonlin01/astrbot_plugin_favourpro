@@ -193,6 +193,26 @@ class FavourProPlugin(Star):
         """检查事件发送者是否为AstrBot管理员"""
         return event.role == "admin"
 
+    
+    @filter.command("好感度")
+    async def admin_query_status(self, event: AstrMessageEvent):
+        """(管理员) 查询指定用户的状态"""
+        if not self._is_admin(event):
+            yield event.plain_result("错误：此命令仅限管理员使用。")
+            return
+        user_id = event.get_sender_id()
+        session_id = self._get_session_id(event)
+        state = self.manager.get_user_state(user_id.strip(), session_id)
+
+        response_text = (
+            f"用户 {user_id} 的状态：\n"
+            f"好感度：{state['favour']}\n"
+            f"关系：{state['relationship']}\n"
+            f"态度：{state['attitude']}"
+        )
+        yield event.plain_result(response_text)
+
+    
     @filter.command("查询好感")
     async def admin_query_status(self, event: AstrMessageEvent, user_id: str):
         """(管理员) 查询指定用户的状态"""
